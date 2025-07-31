@@ -10,39 +10,18 @@ npm install
 ```
 
 ### 2. 環境変数の設定
-`.env.example`を`.env.local`にコピーして設定:
+Vercelダッシュボードで以下の環境変数を設定:
 
-```bash
-cp .env.example .env.local
-```
+- `STRIPE_SECRET_KEY` - Stripeの秘密鍵
+- `STRIPE_WEBHOOK_SECRET` - Webhookの署名シークレット
+- `SMTP_HOST` - メールサーバーのホスト
+- `SMTP_PORT` - メールサーバーのポート
+- `SMTP_SECURE` - SSL/TLS設定
+- `SMTP_USER` - メール送信用ユーザー
+- `SMTP_PASS` - メール送信用パスワード
+- `FROM_EMAIL` - 送信者メールアドレス
 
-### 3. Vercelにデプロイ
-
-#### Vercel アカウント: tackjioffice@gmail.com
-#### Team: solvis
-
-```bash
-# Vercel CLIのインストール
-npm i -g vercel
-
-# ログイン
-vercel login
-
-# デプロイ
-vercel
-
-# 本番環境の環境変数を設定
-vercel env add STRIPE_SECRET_KEY
-vercel env add STRIPE_WEBHOOK_SECRET
-vercel env add SMTP_HOST
-vercel env add SMTP_PORT
-vercel env add SMTP_SECURE
-vercel env add SMTP_USER
-vercel env add SMTP_PASS
-vercel env add FROM_EMAIL
-```
-
-### 4. Stripe Webhookの設定
+### 3. Stripe Webhookの設定
 
 1. Stripeダッシュボード → 開発者 → Webhook
 2. エンドポイントを追加: `https://your-domain.vercel.app/api/webhook/stripe`
@@ -50,19 +29,13 @@ vercel env add FROM_EMAIL
    - `payment_intent.succeeded` - 決済完了時
    - `customer.updated` - 顧客情報更新時
 
-## 監視対象イベント
+## 機能
 
-- **payment_intent.succeeded**: 決済完了時にメール送信
-- **customer.updated**: 顧客のアドレス追加時にメール送信
+- **決済完了時のメール送信**
+- **日本語メールテンプレート**
+- **決済金額に応じたGoogleフォームURL自動切替**
+- **Gmail SMTP対応**
 
-## メール送信条件
+## 更新: 2025-07-31
 
-- 顧客にメールアドレスが設定されている
-- 決済情報が存在する
-- 決済金額に応じてGoogleフォームURLが動的に変更
-
-## Gmail SMTP設定
-
-1. Googleアカウントで2段階認証を有効化
-2. アプリパスワードを生成
-3. `SMTP_PASS`にアプリパスワードを設定
+環境変数の設定を確実にするため、再デプロイが必要です。
