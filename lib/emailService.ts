@@ -64,7 +64,7 @@ function createEmailContent({
 
   const subject = '【みんなの税務顧問】ご契約及び決済完了のご連絡';
   
-  const html = `${customerName} 様
+  const html = `${customerName}
 
 この度は、「みんなの税務顧問」にご契約いただき、誠にありがとうございます。
 お客様からのご契約について、以下の通り決済が完了いたしました。
