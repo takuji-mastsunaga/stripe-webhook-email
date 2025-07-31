@@ -14,12 +14,18 @@ function getFormUrlByAmount(amount: number): string {
     return 'https://docs.google.com/forms/d/e/1FAIpQLSdfGa5yztL7HNBMmACcpNe0YUDVRtIUj6CUaN_96wXAWCEfpA/viewform?usp=dialog';
   }
   
-  // 他の金額の場合のデフォルトURL（必要に応じて追加）
+  // 65円の場合のGoogleフォームURL
+  if (amount === 6500) { // 65円 = 6500cents
+    return 'https://docs.google.com/forms/d/e/DIFFERENT_65_YEN_FORM_URL/viewform?usp=dialog';
+  }
+  
+  // 他の金額の場合のデフォルトURL（50円と同じフォーム）
   return 'https://docs.google.com/forms/d/e/1FAIpQLSdfGa5yztL7HNBMmACcpNe0YUDVRtIUj6CUaN_96wXAWCEfpA/viewform?usp=dialog';
 }
 
 function formatAmount(amountInCents: number): string {
-  return `¥${(amountInCents / 100).toLocaleString()}`;
+  const yenAmount = Math.round(amountInCents / 100);
+  return `${yenAmount}円`;
 }
 
 function createEmailContent({
@@ -49,11 +55,11 @@ function createEmailContent({
         <p style="font-size: 14px; color: #6c757d;">※ 上記IDは決済の証明として大切に保管してください。</p>
       </div>
       
-      <h3 style="color: #495057;">【今後の流れについて】</h3>
+      <h3 style="color: #495057;">【今後のご対応について】</h3>
       
       <div style="margin: 20px 0;">
         <h4 style="color: #495057;">① 重要事項となるGoogleフォーム</h4>
-        <p>以下フォームURLをご記載ください。ご記入ができていないと権限の付与ができません。</p>
+        <p>以下フォームURLは必ずご入力ください。ご記入ができていないと権限の付与ができません。</p>
         <p><strong>※【Googleフォーム】 URL：</strong><br>
            <a href="${formUrl}" style="color: #007bff; text-decoration: none;">${formUrl}</a>
         </p>
@@ -61,7 +67,8 @@ function createEmailContent({
       
       <div style="margin: 20px 0;">
         <h4 style="color: #495057;">② ご契約者様専用の共有フォルダをご用意いたします</h4>
-        <p>こちらへ領収書やレシートをフォルダに入れていただくようお願いいたします。</p>
+        <p>Googleフォーム入力後、Googleフォルダを自動で付与致します。</p>
+        <p>こちらへ領収書やレシートを入れていただくようお願いいたします。</p>
         <p>詳細な手順を後日ご連絡いたしますので、今しばらくお待ちください。</p>
         <p style="color: #dc3545;">手順と違うものは、読み込みができない場合がございます。</p>
       </div>

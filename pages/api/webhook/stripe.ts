@@ -81,7 +81,7 @@ async function processWebhookEvent(event: Stripe.Event, res: NextApiResponse) {
             customerName: customerName,
             amount: paymentIntent.amount,
             paymentIntentId: paymentIntent.id,
-            sessionId: paymentIntent.metadata?.session_id || 'N/A',
+            sessionId: paymentIntent.metadata?.session_id || paymentIntent.id,
           });
           
           console.log(`Email sent to: ${customerEmail} for payment: ${paymentIntent.id}`);
@@ -116,7 +116,7 @@ async function processWebhookEvent(event: Stripe.Event, res: NextApiResponse) {
               customerName: customer.name || 'お客様',
               amount: latestPayment.amount,
               paymentIntentId: latestPayment.id,
-              sessionId: latestPayment.metadata?.session_id || 'N/A',
+              sessionId: latestPayment.metadata?.session_id || latestPayment.id,
             });
           }
         }
