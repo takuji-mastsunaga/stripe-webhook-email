@@ -9,16 +9,29 @@ interface EmailData {
 }
 
 function getFormUrlByAmount(amount: number): string | null {
+  console.log(`Checking amount: ${amount} cents (${Math.round(amount / 100)}円)`);
+  
   // 50円の場合のGoogleフォームURL
-  if (amount === 5000) { // Stripeは cents単位なので50円 = 5000cents
+  if (amount === 50) { // 実際のStripeデータを確認して修正
     return 'https://docs.google.com/forms/d/e/1FAIpQLSdfGa5yztL7HNBMmACcpNe0YUDVRtIUj6CUaN_96wXAWCEfpA/viewform?usp=dialog';
   }
   
-  // 65円の場合のGoogleフォームURL
-  if (amount === 6500) { // 65円 = 6500cents
+  // 65円の場合のGoogleフォームURL  
+  if (amount === 65) {
     return 'https://docs.google.com/forms/d/e/DIFFERENT_65_YEN_FORM_URL/viewform?usp=dialog';
   }
   
+  // 5000 cents (50円) の場合も対応
+  if (amount === 5000) {
+    return 'https://docs.google.com/forms/d/e/1FAIpQLSdfGa5yztL7HNBMmACcpNe0YUDVRtIUj6CUaN_96wXAWCEfpA/viewform?usp=dialog';
+  }
+  
+  // 6500 cents (65円) の場合も対応
+  if (amount === 6500) {
+    return 'https://docs.google.com/forms/d/e/DIFFERENT_65_YEN_FORM_URL/viewform?usp=dialog';
+  }
+  
+  console.log(`Unsupported amount: ${amount} cents`);
   // その他の金額の場合はnullを返す（メール送信しない）
   return null;
 }
@@ -41,7 +54,7 @@ function createEmailContent({
     return null;
   }
   
-  const formattedAmount = formatAmount(amount);
+  // 決済金額の表示は削除
 
   const subject = '【みんなの税務顧問】ご契約及び決済完了のご連絡';
   
@@ -55,9 +68,7 @@ function createEmailContent({
       <div style="background-color: #f8f9fa; border: 1px solid #e9ecef; border-radius: 5px; padding: 20px; margin: 20px 0;">
         <h3 style="margin-top: 0; color: #495057;">📋 決済詳細情報</h3>
         <hr style="border: none; border-top: 1px solid #dee2e6; margin: 15px 0;">
-        <p><strong>決済金額：</strong>${formattedAmount}</p>
         <p><strong>決済ID（PaymentIntent）：</strong>${paymentIntentId}</p>
-        <p><strong>セッションID：</strong>${sessionId}</p>
         <p style="font-size: 14px; color: #6c757d;">※ 上記IDは決済の証明として大切に保管してください。</p>
       </div>
       
