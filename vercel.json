@@ -1,0 +1,35 @@
+{
+  "functions": {
+    "pages/api/webhook/stripe.ts": {
+      "maxDuration": 10
+    }
+  },
+  "headers": [
+    {
+      "source": "/api/webhook/stripe",
+      "headers": [
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        },
+        {
+          "key": "Access-Control-Allow-Methods",
+          "value": "POST, OPTIONS"
+        },
+        {
+          "key": "Access-Control-Allow-Headers",
+          "value": "stripe-signature, content-type"
+        }
+      ]
+    }
+  ],
+  "security": {
+    "protections": {
+      "paths": {
+        "/api/webhook/stripe": {
+          "bypass": true
+        }
+      }
+    }
+  }
+}
