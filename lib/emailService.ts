@@ -9,29 +9,35 @@ interface EmailData {
 }
 
 function getFormUrlByAmount(amount: number): string | null {
-  console.log(`Checking amount: ${amount} cents (${Math.round(amount / 100)}円)`);
+  console.log(`=== Amount Check ===`);
+  console.log(`Received amount: ${amount} (type: ${typeof amount})`);
+  console.log(`Calculated yen: ${Math.round(amount / 100)}円`);
   
-  // 50円の場合のGoogleフォームURL
-  if (amount === 50) { // 実際のStripeデータを確認して修正
-    return 'https://docs.google.com/forms/d/e/1FAIpQLSdfGa5yztL7HNBMmACcpNe0YUDVRtIUj6CUaN_96wXAWCEfpA/viewform?usp=dialog';
-  }
-  
-  // 65円の場合のGoogleフォームURL  
-  if (amount === 65) {
-    return 'https://docs.google.com/forms/d/e/1FAIpQLSdFO74YGRJbKUjTPpARAvx7f99L61RTUBcPVqtvLOA05FbvHw/viewform?usp=dialog';
-  }
-  
-  // 5000 cents (50円) の場合も対応
-  if (amount === 5000) {
-    return 'https://docs.google.com/forms/d/e/1FAIpQLSdfGa5yztL7HNBMmACcpNe0YUDVRtIUj6CUaN_96wXAWCEfpA/viewform?usp=dialog';
-  }
-  
-  // 6500 cents (65円) の場合も対応
+  // 65円の場合を先にチェック（6500 cents）
   if (amount === 6500) {
+    console.log('Matched: 6500 cents (65円) - Using 65 yen form');
     return 'https://docs.google.com/forms/d/e/1FAIpQLSdFO74YGRJbKUjTPpARAvx7f99L61RTUBcPVqtvLOA05FbvHw/viewform?usp=dialog';
   }
   
-  console.log(`Unsupported amount: ${amount} cents`);
+  // 65円の場合（65 cents）
+  if (amount === 65) {
+    console.log('Matched: 65 cents (65円) - Using 65 yen form');
+    return 'https://docs.google.com/forms/d/e/1FAIpQLSdFO74YGRJbKUjTPpARAvx7f99L61RTUBcPVqtvLOA05FbvHw/viewform?usp=dialog';
+  }
+  
+  // 50円の場合（5000 cents）
+  if (amount === 5000) {
+    console.log('Matched: 5000 cents (50円) - Using 50 yen form');
+    return 'https://docs.google.com/forms/d/e/1FAIpQLSdfGa5yztL7HNBMmACcpNe0YUDVRtIUj6CUaN_96wXAWCEfpA/viewform?usp=dialog';
+  }
+  
+  // 50円の場合（50 cents）
+  if (amount === 50) {
+    console.log('Matched: 50 cents (50円) - Using 50 yen form');
+    return 'https://docs.google.com/forms/d/e/1FAIpQLSdfGa5yztL7HNBMmACcpNe0YUDVRtIUj6CUaN_96wXAWCEfpA/viewform?usp=dialog';
+  }
+  
+  console.log(`❌ Unsupported amount: ${amount} cents - No email will be sent`);
   // その他の金額の場合はnullを返す（メール送信しない）
   return null;
 }
