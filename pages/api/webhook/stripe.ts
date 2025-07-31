@@ -54,23 +54,39 @@ async function processWebhookEvent(event: Stripe.Event, res: NextApiResponse) {
       case 'payment_intent.succeeded': {
         const paymentIntent = event.data.object as Stripe.PaymentIntent;
         
-        // 顧客情報を取得
-        let customer: Stripe.Customer | null = null;
+        // メールアドレスを取得（顧客情報またはreceipt_emailから）
+        let customerEmail: string | null = null;
+        let customerName: string = 'お客様';
+        
         if (paymentIntent.customer) {
-          customer = await stripe.customers.retrieve(
+          // 顧客情報を取得
+          const customer = await stripe.customers.retrieve(
             paymentIntent.customer as string
           ) as Stripe.Customer;
+          
+          if (customer.email) {
+            customerEmail = customer.email;
+            customerName = customer.name || 'お客様';
+          }
+        } else if (paymentIntent.receipt_email) {
+          // receipt_emailがある場合はそれを使用
+          customerEmail = paymentIntent.receipt_email;
+          customerName = 'お客様';
         }
 
-        // 顧客にメールアドレスがある場合のみメール送信
-        if (customer && customer.email) {
+        // メールアドレスがある場合のみメール送信
+        if (customerEmail) {
           await sendContractEmail({
-            customerEmail: customer.email,
-            customerName: customer.name || 'お客様',
+            customerEmail: customerEmail,
+            customerName: customerName,
             amount: paymentIntent.amount,
             paymentIntentId: paymentIntent.id,
             sessionId: paymentIntent.metadata?.session_id || 'N/A',
           });
+          
+          console.log(`Email sent to: ${customerEmail} for payment: ${paymentIntent.id}`);
+        } else {
+          console.log(`No email address found for payment: ${paymentIntent.id}`);
         }
         break;
       }
