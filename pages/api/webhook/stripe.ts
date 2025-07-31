@@ -93,33 +93,8 @@ async function processWebhookEvent(event: Stripe.Event, res: NextApiResponse) {
       
       case 'customer.updated': {
         const customer = event.data.object as Stripe.Customer;
-        
-        // アドレスが新しく追加された場合の処理
-        if (customer.email && customer.address) {
-          console.log('Customer address updated:', {
-            customerId: customer.id,
-            email: customer.email,
-            address: customer.address
-          });
-          
-          // 最新の決済情報を取得してメール送信
-          const paymentIntents = await stripe.paymentIntents.list({
-            customer: customer.id,
-            limit: 1,
-          });
-
-          if (paymentIntents.data.length > 0) {
-            const latestPayment = paymentIntents.data[0];
-            
-            await sendContractEmail({
-              customerEmail: customer.email,
-              customerName: customer.name || 'お客様',
-              amount: latestPayment.amount,
-              paymentIntentId: latestPayment.id,
-              sessionId: latestPayment.metadata?.session_id || latestPayment.id,
-            });
-          }
-        }
+        console.log(`Customer updated: ${customer.id} - ${customer.email}`);
+        // customer.updatedイベントでは処理を行わない（payment_intent.succeededのみでメール送信）
         break;
       }
 
