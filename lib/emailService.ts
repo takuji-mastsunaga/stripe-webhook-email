@@ -13,27 +13,15 @@ function getFormUrlByAmount(amount: number): string | null {
   console.log(`Received amount: ${amount} (type: ${typeof amount})`);
   console.log(`Calculated yen: ${Math.round(amount / 100)}円`);
   
-  // 65円の場合を先にチェック（6500 cents）
-  if (amount === 6500) {
-    console.log('Matched: 6500 cents (65円) - Using 65 yen form');
+  // ¥141,768の場合（14176800 cents）
+  if (amount === 14176800) {
+    console.log('Matched: 14176800 cents (¥141,768) - Using high value form');
     return 'https://docs.google.com/forms/d/e/1FAIpQLSdFO74YGRJbKUjTPpARAvx7f99L61RTUBcPVqtvLOA05FbvHw/viewform?usp=dialog';
   }
   
-  // 65円の場合（65 cents）
-  if (amount === 65) {
-    console.log('Matched: 65 cents (65円) - Using 65 yen form');
-    return 'https://docs.google.com/forms/d/e/1FAIpQLSdFO74YGRJbKUjTPpARAvx7f99L61RTUBcPVqtvLOA05FbvHw/viewform?usp=dialog';
-  }
-  
-  // 50円の場合（5000 cents）
-  if (amount === 5000) {
-    console.log('Matched: 5000 cents (50円) - Using 50 yen form');
-    return 'https://docs.google.com/forms/d/e/1FAIpQLSdfGa5yztL7HNBMmACcpNe0YUDVRtIUj6CUaN_96wXAWCEfpA/viewform?usp=dialog';
-  }
-  
-  // 50円の場合（50 cents）
-  if (amount === 50) {
-    console.log('Matched: 50 cents (50円) - Using 50 yen form');
+  // ¥108,988の場合（10898800 cents）
+  if (amount === 10898800) {
+    console.log('Matched: 10898800 cents (¥108,988) - Using standard form');
     return 'https://docs.google.com/forms/d/e/1FAIpQLSdfGa5yztL7HNBMmACcpNe0YUDVRtIUj6CUaN_96wXAWCEfpA/viewform?usp=dialog';
   }
   
