@@ -76,15 +76,20 @@ async function processWebhookEvent(event: Stripe.Event, res: NextApiResponse) {
 
         // メールアドレスがある場合のみメール送信
         if (customerEmail) {
-          await sendContractEmail({
-            customerEmail: customerEmail,
-            customerName: customerName,
-            amount: paymentIntent.amount,
-            paymentIntentId: paymentIntent.id,
-            sessionId: paymentIntent.metadata?.session_id || paymentIntent.id,
-          });
-          
-          console.log(`Email sent to: ${customerEmail} for payment: ${paymentIntent.id}`);
+          try {
+            await sendContractEmail({
+              customerEmail: customerEmail,
+              customerName: customerName,
+              amount: paymentIntent.amount,
+              paymentIntentId: paymentIntent.id,
+              sessionId: paymentIntent.metadata?.session_id || paymentIntent.id,
+            });
+            
+            console.log(`Email sent to: ${customerEmail} for payment: ${paymentIntent.id}`);
+          } catch (error) {
+            console.error(`Email sending failed for payment: ${paymentIntent.id}`, error);
+            // メール送信エラーでもwebhookは成功として返す
+          }
         } else {
           console.log(`No email address found for payment: ${paymentIntent.id}`);
         }
