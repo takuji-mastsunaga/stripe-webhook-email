@@ -22,14 +22,5 @@
         }
       ]
     }
-  ],
-  "security": {
-    "protections": {
-      "paths": {
-        "/api/webhook/stripe": {
-          "bypass": true
-        }
-      }
-    }
-  }
+  ]
 }
