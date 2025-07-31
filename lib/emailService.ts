@@ -135,7 +135,7 @@ export async function sendContractEmail(emailData: EmailData): Promise<void> {
     to: emailData.customerEmail,
     subject,
     text: html, // プレーンテキストとして送信
-    html: html.replace(/\n/g, '<br>'), // HTMLバージョンも提供
+    html: `<div style="color: black;">${html.replace(/\n/g, '<br>')}</div>`, // HTMLバージョンを黒文字で提供
   };
 
   try {
