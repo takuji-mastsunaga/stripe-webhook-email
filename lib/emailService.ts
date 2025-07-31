@@ -18,7 +18,7 @@ function getFormUrlByAmount(amount: number): string | null {
   
   // 65円の場合のGoogleフォームURL  
   if (amount === 65) {
-    return 'https://docs.google.com/forms/d/e/DIFFERENT_65_YEN_FORM_URL/viewform?usp=dialog';
+    return 'https://docs.google.com/forms/d/e/1FAIpQLSdFO74YGRJbKUjTPpARAvx7f99L61RTUBcPVqtvLOA05FbvHw/viewform?usp=dialog';
   }
   
   // 5000 cents (50円) の場合も対応
@@ -28,7 +28,7 @@ function getFormUrlByAmount(amount: number): string | null {
   
   // 6500 cents (65円) の場合も対応
   if (amount === 6500) {
-    return 'https://docs.google.com/forms/d/e/DIFFERENT_65_YEN_FORM_URL/viewform?usp=dialog';
+    return 'https://docs.google.com/forms/d/e/1FAIpQLSdFO74YGRJbKUjTPpARAvx7f99L61RTUBcPVqtvLOA05FbvHw/viewform?usp=dialog';
   }
   
   console.log(`Unsupported amount: ${amount} cents`);
