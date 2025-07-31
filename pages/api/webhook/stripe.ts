@@ -2,15 +2,11 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import Stripe from 'stripe';
 import { sendContractEmail } from '../../../lib/emailService';
 
-// Disable Vercel authentication for this API route
+// Disable body parser to get raw body for Stripe signature verification
 export const config = {
   api: {
-    bodyParser: {
-      sizeLimit: '1mb',
-    },
+    bodyParser: false,
   },
-  runtime: 'nodejs',
-  unstable_includeFiles: [],
 };
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
@@ -32,14 +28,27 @@ export default async function handler(
   const sig = req.headers['stripe-signature'] as string;
   let event: Stripe.Event;
 
-  try {
-    const body = JSON.stringify(req.body);
-    event = stripe.webhooks.constructEvent(body, sig, endpointSecret);
-  } catch (err) {
-    console.error('Webhook signature verification failed:', err);
-    return res.status(400).send(`Webhook Error: ${err}`);
-  }
+  // Get raw body for signature verification
+  let buf = '';
+  req.setEncoding('utf8');
+  req.on('data', (chunk) => {
+    buf += chunk;
+  });
+  
+  req.on('end', () => {
+    try {
+      event = stripe.webhooks.constructEvent(buf, sig, endpointSecret);
+    } catch (err) {
+      console.error('Webhook signature verification failed:', err);
+      return res.status(400).send(`Webhook Error: ${err}`);
+    }
 
+    // Process the webhook event
+    processWebhookEvent(event, res);
+  });
+}
+
+async function processWebhookEvent(event: Stripe.Event, res: NextApiResponse) {
   try {
     switch (event.type) {
       case 'payment_intent.succeeded': {
