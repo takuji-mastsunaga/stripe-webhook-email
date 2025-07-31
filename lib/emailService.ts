@@ -11,28 +11,27 @@ interface EmailData {
 function getFormUrlByAmount(amount: number): string | null {
   console.log(`=== Amount Check ===`);
   console.log(`Received amount: ${amount} (type: ${typeof amount})`);
-  console.log(`Calculated yen: ${Math.round(amount / 100)}円`);
+  console.log(`Amount in JPY: ¥${amount}`);
   
-  // ¥141,768の場合（14176800 cents）
-  if (amount === 14176800) {
-    console.log('Matched: 14176800 cents (¥141,768) - Using high value form');
+  // ¥141,768の場合（JPY通貨では141768として保存）
+  if (amount === 141768) {
+    console.log('Matched: 141768 JPY (¥141,768) - Using high value form');
     return 'https://docs.google.com/forms/d/e/1FAIpQLSdFO74YGRJbKUjTPpARAvx7f99L61RTUBcPVqtvLOA05FbvHw/viewform?usp=dialog';
   }
   
-  // ¥108,988の場合（10898800 cents）
-  if (amount === 10898800) {
-    console.log('Matched: 10898800 cents (¥108,988) - Using standard form');
+  // ¥108,988の場合（JPY通貨では108988として保存）
+  if (amount === 108988) {
+    console.log('Matched: 108988 JPY (¥108,988) - Using standard form');
     return 'https://docs.google.com/forms/d/e/1FAIpQLSdfGa5yztL7HNBMmACcpNe0YUDVRtIUj6CUaN_96wXAWCEfpA/viewform?usp=dialog';
   }
   
-  console.log(`❌ Unsupported amount: ${amount} cents - No email will be sent`);
+  console.log(`❌ Unsupported amount: ${amount} JPY - No email will be sent`);
   // その他の金額の場合はnullを返す（メール送信しない）
   return null;
 }
 
-function formatAmount(amountInCents: number): string {
-  const yenAmount = Math.round(amountInCents / 100);
-  return `${yenAmount}円`;
+function formatAmount(amountInJPY: number): string {
+  return `¥${amountInJPY.toLocaleString()}`;
 }
 
 function createEmailContent({
@@ -102,7 +101,7 @@ export async function sendContractEmail(emailData: EmailData): Promise<void> {
   
   // サポート対象外の金額の場合はメール送信しない
   if (!emailContent) {
-    console.log(`Email not sent - unsupported amount: ${emailData.amount} cents (${Math.round(emailData.amount / 100)}円)`);
+    console.log(`Email not sent - unsupported amount: ¥${emailData.amount}`);
     return;
   }
 
@@ -128,7 +127,7 @@ export async function sendContractEmail(emailData: EmailData): Promise<void> {
 
   try {
     const info = await transporter.sendMail(mailOptions);
-    console.log(`Email sent successfully to ${emailData.customerEmail} for ${Math.round(emailData.amount / 100)}円: ${info.messageId}`);
+    console.log(`Email sent successfully to ${emailData.customerEmail} for ¥${emailData.amount}: ${info.messageId}`);
   } catch (error) {
     console.error('Email sending failed:', error);
     throw error;
