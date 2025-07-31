@@ -8,7 +8,7 @@ interface EmailData {
   sessionId: string;
 }
 
-function getFormUrlByAmount(amount: number): string {
+function getFormUrlByAmount(amount: number): string | null {
   // 50円の場合のGoogleフォームURL
   if (amount === 5000) { // Stripeは cents単位なので50円 = 5000cents
     return 'https://docs.google.com/forms/d/e/1FAIpQLSdfGa5yztL7HNBMmACcpNe0YUDVRtIUj6CUaN_96wXAWCEfpA/viewform?usp=dialog';
@@ -19,8 +19,8 @@ function getFormUrlByAmount(amount: number): string {
     return 'https://docs.google.com/forms/d/e/DIFFERENT_65_YEN_FORM_URL/viewform?usp=dialog';
   }
   
-  // 他の金額の場合のデフォルトURL（50円と同じフォーム）
-  return 'https://docs.google.com/forms/d/e/1FAIpQLSdfGa5yztL7HNBMmACcpNe0YUDVRtIUj6CUaN_96wXAWCEfpA/viewform?usp=dialog';
+  // その他の金額の場合はnullを返す（メール送信しない）
+  return null;
 }
 
 function formatAmount(amountInCents: number): string {
@@ -33,8 +33,14 @@ function createEmailContent({
   amount,
   paymentIntentId,
   sessionId,
-}: EmailData): { subject: string; html: string } {
+}: EmailData): { subject: string; html: string } | null {
   const formUrl = getFormUrlByAmount(amount);
+  
+  // サポート対象外の金額の場合はnullを返す
+  if (!formUrl) {
+    return null;
+  }
+  
   const formattedAmount = formatAmount(amount);
 
   const subject = '【みんなの税務顧問】ご契約及び決済完了のご連絡';
@@ -95,6 +101,14 @@ function createEmailContent({
 }
 
 export async function sendContractEmail(emailData: EmailData): Promise<void> {
+  const emailContent = createEmailContent(emailData);
+  
+  // サポート対象外の金額の場合はメール送信しない
+  if (!emailContent) {
+    console.log(`Email not sent - unsupported amount: ${emailData.amount} cents (${Math.round(emailData.amount / 100)}円)`);
+    return;
+  }
+
   const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST,
     port: parseInt(process.env.SMTP_PORT || '587'),
@@ -105,7 +119,7 @@ export async function sendContractEmail(emailData: EmailData): Promise<void> {
     },
   });
 
-  const { subject, html } = createEmailContent(emailData);
+  const { subject, html } = emailContent;
 
   const mailOptions = {
     from: process.env.FROM_EMAIL || 'minzei@solvis-group.com',
@@ -116,7 +130,7 @@ export async function sendContractEmail(emailData: EmailData): Promise<void> {
 
   try {
     const info = await transporter.sendMail(mailOptions);
-    console.log('Email sent successfully:', info.messageId);
+    console.log(`Email sent successfully to ${emailData.customerEmail} for ${Math.round(emailData.amount / 100)}円: ${info.messageId}`);
   } catch (error) {
     console.error('Email sending failed:', error);
     throw error;
