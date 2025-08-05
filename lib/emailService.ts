@@ -13,15 +13,15 @@ function getFormUrlByAmount(amount: number): string | null {
   console.log(`Received amount: ${amount} (type: ${typeof amount})`);
   console.log(`Amount in JPY: ¥${amount}`);
   
-  // ¥141,768の場合（JPY通貨では141768として保存）
-  if (amount === 141768) {
-    console.log('Matched: 141768 JPY (¥141,768) - Using high value form');
+  // ¥128,880の場合（JPY通貨では128880として保存）
+  if (amount === 128880) {
+    console.log('Matched: 128880 JPY (¥128,880) - Using high value form');
     return 'https://docs.google.com/forms/d/e/1FAIpQLSdFO74YGRJbKUjTPpARAvx7f99L61RTUBcPVqtvLOA05FbvHw/viewform?usp=dialog';
   }
   
-  // ¥108,988の場合（JPY通貨では108988として保存）
-  if (amount === 108988) {
-    console.log('Matched: 108988 JPY (¥108,988) - Using standard form');
+  // ¥99,080の場合（JPY通貨では99080として保存）
+  if (amount === 99080) {
+    console.log('Matched: 99080 JPY (¥99,080) - Using standard form');
     return 'https://docs.google.com/forms/d/e/1FAIpQLSdfGa5yztL7HNBMmACcpNe0YUDVRtIUj6CUaN_96wXAWCEfpA/viewform?usp=dialog';
   }
   
