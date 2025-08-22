@@ -13,9 +13,9 @@ function getFormUrlByAmount(amount: number): string | null {
   console.log(`Received amount: ${amount} (type: ${typeof amount})`);
   console.log(`Amount in JPY: ¥${amount}`);
   
-  // ¥128,880の場合（JPY通貨では128880として保存）
-  if (amount === 128880) {
-    console.log('Matched: 128880 JPY (¥128,880) - Using high value form');
+  // 高額プランの金額（¥128,880、¥12,300、¥12,000、¥124,880）
+  if (amount === 128880 || amount === 12300 || amount === 12000 || amount === 124880) {
+    console.log(`Matched: ${amount} JPY (¥${amount.toLocaleString()}) - Using high value form`);
     return 'https://docs.google.com/forms/d/e/1FAIpQLSdFO74YGRJbKUjTPpARAvx7f99L61RTUBcPVqtvLOA05FbvHw/viewform?usp=dialog';
   }
   

@@ -76,9 +76,11 @@ async function processWebhookEvent(event: Stripe.Event, res: NextApiResponse) {
 
         // メールアドレスがある場合のみメール送信
         if (customerEmail) {
-          // 標準プランの金額（¥99,080、¥9,800、¥9,500、¥95,080）の場合は重複チェック
+          // 重複チェックが必要な金額を定義
           const standardPlanAmounts = [99080, 9800, 9500, 95080];
-          const needsDuplicateCheck = standardPlanAmounts.includes(paymentIntent.amount);
+          const highPlanAmounts = [128880, 12300, 12000, 124880];
+          const allPlanAmounts = [...standardPlanAmounts, ...highPlanAmounts];
+          const needsDuplicateCheck = allPlanAmounts.includes(paymentIntent.amount);
           
           if (needsDuplicateCheck && paymentIntent.customer) {
             // 顧客のメタデータを確認
@@ -120,23 +122,8 @@ async function processWebhookEvent(event: Stripe.Event, res: NextApiResponse) {
                 // メール送信エラーでもwebhookは成功として返す
               }
             }
-          } else if (!needsDuplicateCheck) {
-            // ¥128,880（高額プラン）などの場合は従来通り送信
-            try {
-              await sendContractEmail({
-                customerEmail: customerEmail,
-                customerName: customerName,
-                amount: paymentIntent.amount,
-                paymentIntentId: paymentIntent.id,
-                sessionId: paymentIntent.metadata?.session_id || paymentIntent.id,
-              });
-              
-              console.log(`Email sent to: ${customerEmail} for payment: ${paymentIntent.id}`);
-            } catch (error) {
-              console.error(`Email sending failed for payment: ${paymentIntent.id}`, error);
-              // メール送信エラーでもwebhookは成功として返す
-            }
           } else {
+            // 顧客IDがない場合（重複チェックが必要な金額だが顧客IDがない）
             console.log(`No customer ID found for duplicate check - Skipping email for: ${paymentIntent.id}`);
           }
         } else {
