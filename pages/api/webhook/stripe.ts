@@ -76,19 +76,68 @@ async function processWebhookEvent(event: Stripe.Event, res: NextApiResponse) {
 
         // メールアドレスがある場合のみメール送信
         if (customerEmail) {
-          try {
-            await sendContractEmail({
-              customerEmail: customerEmail,
-              customerName: customerName,
-              amount: paymentIntent.amount,
-              paymentIntentId: paymentIntent.id,
-              sessionId: paymentIntent.metadata?.session_id || paymentIntent.id,
-            });
+          // 標準プランの金額（¥99,080、¥9,800、¥9,500、¥95,080）の場合は重複チェック
+          const standardPlanAmounts = [99080, 9800, 9500, 95080];
+          const needsDuplicateCheck = standardPlanAmounts.includes(paymentIntent.amount);
+          
+          if (needsDuplicateCheck && paymentIntent.customer) {
+            // 顧客のメタデータを確認
+            const customer = await stripe.customers.retrieve(
+              paymentIntent.customer as string
+            ) as Stripe.Customer;
             
-            console.log(`Email sent to: ${customerEmail} for payment: ${paymentIntent.id}`);
-          } catch (error) {
-            console.error(`Email sending failed for payment: ${paymentIntent.id}`, error);
-            // メール送信エラーでもwebhookは成功として返す
+            // メタデータにform_sentフラグがある場合は送信しない
+            if (customer.metadata?.form_sent === 'true') {
+              console.log(`Form already sent to customer: ${customer.id} - Skipping email`);
+            } else {
+              // 初回送信の場合
+              try {
+                await sendContractEmail({
+                  customerEmail: customerEmail,
+                  customerName: customerName,
+                  amount: paymentIntent.amount,
+                  paymentIntentId: paymentIntent.id,
+                  sessionId: paymentIntent.metadata?.session_id || paymentIntent.id,
+                });
+                
+                console.log(`Email sent to: ${customerEmail} for payment: ${paymentIntent.id}`);
+                
+                // メタデータを更新してフラグを設定
+                await stripe.customers.update(
+                  paymentIntent.customer as string,
+                  {
+                    metadata: {
+                      ...customer.metadata,
+                      form_sent: 'true',
+                      form_sent_date: new Date().toISOString(),
+                      form_sent_payment_id: paymentIntent.id
+                    }
+                  }
+                );
+                console.log(`Customer metadata updated: form_sent flag set for ${customer.id}`);
+              } catch (error) {
+                console.error(`Email sending failed for payment: ${paymentIntent.id}`, error);
+                // メール送信エラーでもwebhookは成功として返す
+              }
+            }
+          } else if (!needsDuplicateCheck) {
+            // ¥128,880（高額プラン）などの場合は従来通り送信
+            try {
+              await sendContractEmail({
+                customerEmail: customerEmail,
+                customerName: customerName,
+                amount: paymentIntent.amount,
+                paymentIntentId: paymentIntent.id,
+                sessionId: paymentIntent.metadata?.session_id || paymentIntent.id,
+              });
+              
+              console.log(`Email sent to: ${customerEmail} for payment: ${paymentIntent.id}`);
+            } catch (error) {
+              console.error(`Email sending failed for payment: ${paymentIntent.id}`, error);
+              // メール送信エラーでもwebhookは成功として返す
+            }
+          } else {
+            console.log(`No customer ID found for duplicate check - Skipping email for: ${paymentIntent.id}`);
           }
         } else {
           console.log(`No email address found for payment: ${paymentIntent.id}`);

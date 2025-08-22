@@ -19,9 +19,9 @@ function getFormUrlByAmount(amount: number): string | null {
     return 'https://docs.google.com/forms/d/e/1FAIpQLSdFO74YGRJbKUjTPpARAvx7f99L61RTUBcPVqtvLOA05FbvHw/viewform?usp=dialog';
   }
   
-  // ¥99,080の場合（JPY通貨では99080として保存）
-  if (amount === 99080) {
-    console.log('Matched: 99080 JPY (¥99,080) - Using standard form');
+  // 標準プランの金額（¥99,080、¥9,800、¥9,500、¥95,080）
+  if (amount === 99080 || amount === 9800 || amount === 9500 || amount === 95080) {
+    console.log(`Matched: ${amount} JPY (¥${amount.toLocaleString()}) - Using standard form`);
     return 'https://docs.google.com/forms/d/e/1FAIpQLSdfGa5yztL7HNBMmACcpNe0YUDVRtIUj6CUaN_96wXAWCEfpA/viewform?usp=dialog';
   }
   
